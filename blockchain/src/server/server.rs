@@ -1,6 +1,7 @@
 use crate::blockchain::Chain;
 use crate::blockchain::Transaction;
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::sync::Mutex;
@@ -36,6 +37,8 @@ async fn index() -> impl Responder {
 }
 
 pub async fn chain_handler(chain: web::Data<Mutex<Chain>>) -> impl Responder {
+    info!("Inside the chain handler");
+
     let chain = chain.lock().unwrap();
     HttpResponse::Ok().json(chain.to_json())
 }
@@ -121,14 +124,16 @@ async fn nodes(state: web::Data<Mutex<Chain>>) -> impl Responder {
 }
 
 pub async fn start_server() -> std::io::Result<()> {
+    // ...
+
     let chain = web::Data::new(Mutex::new(Chain::new()));
+    info!("Chain is initialized");
 
     HttpServer::new(move || {
-        let chain = chain.clone();
-
         App::new()
+            .app_data(chain.clone()) // Pass the wrapped data to `App::app_data()`
             .route("/", web::get().to(index))
-            .route("/chain", web::get().to(chain_handler)) // Use chain_handler as the route handler
+            .route("/chain", web::get().to(chain_handler))
             .route("/mine", web::get().to(mine))
             .route("/transactions/new", web::post().to(new_transaction))
             .route("/nodes/resolve", web::get().to(resolve))

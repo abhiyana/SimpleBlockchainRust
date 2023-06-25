@@ -1,5 +1,3 @@
-# SimpleBlockchainRust
-
 # Simple Blockchain Implementation in Rust
 
 This project is a simple implementation of a blockchain using the Rust programming language. It aims to provide a basic understanding of blockchain concepts and demonstrate how they can be implemented in Rust.
